@@ -2,8 +2,10 @@
   "defaultMode": "acceptEdits",
   "permissions": {
     "allow": [
-      "Bash(powershell -ExecutionPolicy Bypass -File .\\scripts\\validate.ps1)",
-      "Bash(powershell -ExecutionPolicy Bypass -File .\\scripts\\lightweight-format.ps1)",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"& .\\scripts\\validate.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"& .\\scripts\\lightweight-format.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"& .\\scripts\\block-dangerous-command.ps1 '$CLAUDE_TOOL_INPUT'\")",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"& .\\scripts\\require-validation-report.ps1\")",
       "Bash(.\\gradlew.bat :app:compileDebugKotlin)",
       "Bash(.\\gradlew.bat :app:testDebugUnitTest)",
       "Bash(.\\gradlew.bat :app:detekt)",
@@ -27,7 +29,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -ExecutionPolicy Bypass -File .\\scripts\\lightweight-format.ps1"
+            "command": "powershell -ExecutionPolicy Bypass -Command \"& .\\scripts\\lightweight-format.ps1\""
           }
         ]
       }
@@ -38,7 +40,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -ExecutionPolicy Bypass -File .\\scripts\\block-dangerous-command.ps1 \"$CLAUDE_TOOL_INPUT\""
+            "command": "powershell -ExecutionPolicy Bypass -Command \"& .\\scripts\\block-dangerous-command.ps1 '$CLAUDE_TOOL_INPUT'\""
           }
         ]
       }
@@ -48,7 +50,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -ExecutionPolicy Bypass -File .\\scripts\\require-validation-report.ps1"
+            "command": "powershell -ExecutionPolicy Bypass -Command \"& .\\scripts\\require-validation-report.ps1\""
           }
         ]
       }
