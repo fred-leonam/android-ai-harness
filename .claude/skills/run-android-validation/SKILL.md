@@ -42,3 +42,5 @@ agent: android-validator
 
 \- Prefer concise, structured output
 
+\- Tests must show `N tests executed` in output or in the XML results under `app/build/test-results/`. A result of `UP-TO-DATE` means tests did NOT run — treat it as a failure and re-run with `--rerun-tasks`.
+

@@ -10,7 +10,7 @@ Write-Host "== compile =="
 .\gradlew.bat :app:compileDebugKotlin
 
 Write-Host "== tests =="
-.\gradlew.bat :app:testDebugUnitTest
+.\gradlew.bat :app:testDebugUnitTest --rerun-tasks
 
 Write-Host "== detekt =="
 .\gradlew.bat :app:detekt
