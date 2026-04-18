@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import com.thoughtworks.productssearch.ui.SearchScreen
 import com.thoughtworks.productssearch.ui.theme.TheProductsSearchTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -15,6 +16,7 @@ class MainActivity : ComponentActivity() {
     enableEdgeToEdge()
     setContent {
       TheProductsSearchTheme {
+        SearchScreen()
       }
     }
   }

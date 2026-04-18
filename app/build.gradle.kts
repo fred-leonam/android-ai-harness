@@ -4,6 +4,7 @@ plugins {
   alias(libs.plugins.kotlin.ksp)
   alias(libs.plugins.compose.compiler)
   alias(libs.plugins.hilt)
+  alias(libs.plugins.detekt)
 }
 
 android {
@@ -98,4 +99,11 @@ dependencies {
 
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    detektPlugins(libs.detekt.formatting)
+}
+
+detekt {
+    config.setFrom(rootProject.file("config/detekt.yml"))
+    buildUponDefaultConfig = true
 }
