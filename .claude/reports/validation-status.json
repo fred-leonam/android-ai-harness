@@ -1,8 +1,39 @@
-{
-  "timestamp": "2026-04-19T00:00:00+00:00",
-  "compile": "PASS",
-  "tests": "PASS",
-  "detekt": "PASS",
-  "overall": "PASS",
-  "summary": "All three canonical validation steps passed: compileDebugKotlin, testDebugUnitTest, detekt."
+﻿{
+    "timestamp":  "2026-04-19T19:30:24.2696809-03:00",
+    "started_at":  "2026-04-19T19:29:56.1487063-03:00",
+    "finished_at":  "2026-04-19T19:30:24.2696809-03:00",
+    "duration_ms":  28121,
+    "generator":  "scripts/validate.ps1",
+    "schema_version":  2,
+    "compile":  "PASS",
+    "tests":  "PASS",
+    "detekt":  "PASS",
+    "overall":  "PASS",
+    "summary":  "All canonical validation steps passed.",
+    "steps":  {
+                  "compile":  {
+                                  "status":  "PASS",
+                                  "command":  ".\\gradlew.bat :app:compileDebugKotlin",
+                                  "exit_code":  0,
+                                  "started_at":  "2026-04-19T19:29:56.2458776-03:00",
+                                  "finished_at":  "2026-04-19T19:29:58.8666020-03:00",
+                                  "duration_ms":  2621
+                              },
+                  "tests":  {
+                                "status":  "PASS",
+                                "command":  ".\\gradlew.bat :app:testDebugUnitTest --rerun-tasks",
+                                "exit_code":  0,
+                                "started_at":  "2026-04-19T19:29:58.9664876-03:00",
+                                "finished_at":  "2026-04-19T19:30:22.0655842-03:00",
+                                "duration_ms":  23099
+                            },
+                  "detekt":  {
+                                 "status":  "PASS",
+                                 "command":  ".\\gradlew.bat :app:detekt",
+                                 "exit_code":  0,
+                                 "started_at":  "2026-04-19T19:30:22.1168910-03:00",
+                                 "finished_at":  "2026-04-19T19:30:24.2646931-03:00",
+                                 "duration_ms":  2148
+                             }
+              }
 }

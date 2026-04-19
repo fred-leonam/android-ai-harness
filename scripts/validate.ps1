@@ -28,12 +28,15 @@ function Invoke-ValidationStep {
     Write-Host "== $Name =="
 
     $stepStartedAt = [DateTimeOffset]::Now
+    $savedEAP = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
     $output = & $Command[0] $Command[1..($Command.Length - 1)] 2>&1
     $exitCode = $LASTEXITCODE
+    $ErrorActionPreference = $savedEAP
     $stepFinishedAt = [DateTimeOffset]::Now
 
     if ($null -ne $output) {
-        $output | ForEach-Object { Write-Host $_ }
+        $output | ForEach-Object { Write-Host ([string]$_) }
     }
 
     return [ordered]@{

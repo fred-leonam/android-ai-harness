@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(powershell *)"
+      "Bash(powershell *)",
+      "Bash(cmd.exe /c \"gradlew.bat :app:testDebugUnitTest --rerun-tasks\")",
+      "Bash(cmd.exe /c \".\\\\gradlew.bat :app:testDebugUnitTest --rerun-tasks\")",
+      "Bash(cmd.exe /c \".\\\\gradlew.bat :app:detekt\")",
+      "Bash(powershell.exe -ExecutionPolicy Bypass -File \"C:/Users/fredl/Documents/projects/android-profile-assessment/scripts/validate.ps1\")"
     ]
   }
 }
