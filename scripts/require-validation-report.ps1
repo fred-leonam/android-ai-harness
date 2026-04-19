@@ -1,4 +1,5 @@
 $ErrorActionPreference = "Stop"
+Set-StrictMode -Version Latest
 
 $reportPath = ".\.claude\reports\validation-status.json"
 
@@ -15,13 +16,36 @@ try {
     exit 2
 }
 
-$requiredProps = @("timestamp", "compile", "tests", "detekt", "overall", "summary")
+$requiredProps = @(
+    "timestamp",
+    "started_at",
+    "finished_at",
+    "duration_ms",
+    "generator",
+    "schema_version",
+    "compile",
+    "tests",
+    "detekt",
+    "overall",
+    "summary",
+    "steps"
+)
 
 foreach ($prop in $requiredProps) {
     if (-not ($report.PSObject.Properties.Name -contains $prop)) {
         Write-Host "Blocking stop: validation report is missing required property '$prop'"
         exit 2
     }
+}
+
+if ([string]$report.generator -ne "scripts/validate.ps1") {
+    Write-Host "Blocking stop: validation report generator must be 'scripts/validate.ps1'"
+    exit 2
+}
+
+if ([int]$report.schema_version -ne 2) {
+    Write-Host "Blocking stop: validation report schema_version must be 2"
+    exit 2
 }
 
 $allowedPhaseValues = @("PASS", "FAIL", "NOT_RUN")
@@ -49,8 +73,104 @@ if ([string]::IsNullOrWhiteSpace($summary)) {
 
 try {
     $timestamp = [DateTimeOffset]::Parse($report.timestamp)
+    $startedAt = [DateTimeOffset]::Parse($report.started_at)
+    $finishedAt = [DateTimeOffset]::Parse($report.finished_at)
 } catch {
-    Write-Host "Blocking stop: validation timestamp is invalid"
+    Write-Host "Blocking stop: validation timestamps are invalid"
+    exit 2
+}
+
+if ($finishedAt -lt $startedAt) {
+    Write-Host "Blocking stop: finished_at is earlier than started_at"
+    exit 2
+}
+
+if ([int]$report.duration_ms -lt 0) {
+    Write-Host "Blocking stop: duration_ms must be non-negative"
+    exit 2
+}
+
+$expectedCommands = @{
+    compile = ".\gradlew.bat :app:compileDebugKotlin"
+    tests   = ".\gradlew.bat :app:testDebugUnitTest --rerun-tasks"
+    detekt  = ".\gradlew.bat :app:detekt"
+}
+
+foreach ($stepName in @("compile", "tests", "detekt")) {
+    if (-not ($report.steps.PSObject.Properties.Name -contains $stepName)) {
+        Write-Host "Blocking stop: steps.$stepName is missing"
+        exit 2
+    }
+
+    $step = $report.steps.$stepName
+
+    foreach ($requiredStepProp in @("status", "command", "exit_code", "started_at", "finished_at", "duration_ms")) {
+        if (-not ($step.PSObject.Properties.Name -contains $requiredStepProp)) {
+            Write-Host "Blocking stop: steps.$stepName.$requiredStepProp is missing"
+            exit 2
+        }
+    }
+
+    if ([string]$step.command -ne $expectedCommands[$stepName]) {
+        Write-Host "Blocking stop: unexpected command for steps.$stepName"
+        exit 2
+    }
+
+    if ([string]$step.status -ne [string]$report.$stepName) {
+        Write-Host "Blocking stop: steps.$stepName.status does not match top-level $stepName"
+        exit 2
+    }
+
+    if (
+        [string]$step.status -eq "PASS" -and
+        [int]$step.exit_code -ne 0
+    ) {
+        Write-Host "Blocking stop: PASS step '$stepName' must have exit_code 0"
+        exit 2
+    }
+
+    if (
+        [string]$step.status -eq "FAIL" -and
+        [int]$step.exit_code -eq 0
+    ) {
+        Write-Host "Blocking stop: FAIL step '$stepName' cannot have exit_code 0"
+        exit 2
+    }
+
+    if (
+        [string]$step.status -eq "NOT_RUN" -and
+        [int]$step.exit_code -ne -1
+    ) {
+        Write-Host "Blocking stop: NOT_RUN step '$stepName' must have exit_code -1"
+        exit 2
+    }
+
+    try {
+        $null = [DateTimeOffset]::Parse($step.started_at)
+        $null = [DateTimeOffset]::Parse($step.finished_at)
+    } catch {
+        if ([string]$step.status -ne "NOT_RUN") {
+            Write-Host "Blocking stop: timestamps for executed step '$stepName' are invalid"
+            exit 2
+        }
+    }
+}
+
+if (
+    $report.compile -eq "PASS" -and
+    $report.tests -eq "PASS" -and
+    $report.detekt -eq "PASS" -and
+    $report.overall -ne "PASS"
+) {
+    Write-Host "Blocking stop: overall must be PASS when all phases pass"
+    exit 2
+}
+
+if (
+    ($report.compile -ne "PASS" -or $report.tests -ne "PASS" -or $report.detekt -ne "PASS") -and
+    $report.overall -ne "FAIL"
+) {
+    Write-Host "Blocking stop: overall must be FAIL when any phase is not PASS"
     exit 2
 }
 
