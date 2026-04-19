@@ -1,46 +1,40 @@
-\---
-
+---
 name: run-android-validation
-
-description: Run compile, unit tests, and detekt for the Android app
-
+description: Run deterministic Android validation for this repo, summarize compile test and detekt results, and write a validation report artifact
+context: fork
 agent: android-validator
+---
 
-\---
+# Skill: run-android-validation
 
+Run validation for this Android repository and produce a deterministic validation artifact.
 
+## Validation commands
+Always prefer Windows-native execution.
 
-\# Skill: run-android-validation
+Run:
+1. `powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1`
 
+If the repository does not contain `.\scripts\validate.ps1`, then run the smallest equivalent Windows-native command set needed for:
+- compile
+- unit tests
+- detekt
 
+Use:
+- `.\gradlew.bat`
 
-\## Procedure
+## Required output
+After validation completes, write this file:
 
-1\. Run `powershell -ExecutionPolicy Bypass -File .\\scripts\\validate.ps1`
+- `.claude/reports/validation-status.json`
 
-2\. Summarize results as:
-
-&#x20;  - compile: PASS/FAIL
-
-&#x20;  - tests: PASS/FAIL
-
-&#x20;  - detekt: PASS/FAIL
-
-3\. Extract the most relevant failure lines if any.
-
-4\. If validation fails, invoke `repair-from-sensors`.
-
-5\. If validation passes, hand off to `android-reviewer`.
-
-
-
-\## Rules
-
-\- Never assume validation passed
-
-\- Never suppress failures
-
-\- Prefer concise, structured output
-
-\- Tests must show `N tests executed` in output or in the XML results under `app/build/test-results/`. A result of `UP-TO-DATE` means tests did NOT run — treat it as a failure and re-run with `--rerun-tasks`.
-
+## Required JSON shape
+```json
+{
+  "timestamp": "ISO-8601 timestamp with timezone",
+  "compile": "PASS | FAIL | NOT_RUN",
+  "tests": "PASS | FAIL | NOT_RUN",
+  "detekt": "PASS | FAIL | NOT_RUN",
+  "overall": "PASS | FAIL",
+  "summary": "short human-readable summary"
+}

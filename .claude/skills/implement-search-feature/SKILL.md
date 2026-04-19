@@ -1,94 +1,43 @@
-\---
-
+---
 name: implement-search-feature
-
-description: Implement the unfinished product search flow in this Android assessment app
-
+description: Implement the unfinished product search flow in this Android assessment app with minimal repo-scoped changes
+context: fork
 agent: android-implementer
+---
 
-\---
+# Skill: implement-search-feature
 
+Implement the unfinished product search flow in this Android assessment app.
 
+## Required workflow
+1. Inspect `README.md`, `CLAUDE.md`, and the relevant source files first.
+2. Plan the smallest viable change set.
+3. Implement incrementally.
+4. Keep the solution aligned with the assessment constraints.
+5. Do not broaden scope unless required to make the feature work.
 
-\# Skill: implement-search-feature
+## Hard constraints
+- Use Kotlin.
+- Use Jetpack Compose.
+- Use the existing `ProductService`.
+- Do not introduce Repository or UseCase layers.
+- Prefer minimal changes over broad rewrites.
+- Keep the solution simple and aligned with the assessment.
 
+## Operating system expectations
+This repository is executed primarily on Windows.
 
+Always prefer:
+- PowerShell scripts (`.ps1`)
+- `powershell -ExecutionPolicy Bypass -File ...`
+- `.\gradlew.bat`
 
-\## Use when
+Do not assume:
+- bash
+- WSL
+- Git Bash
+- Unix utilities like `chmod`, `sed`, `grep`, or `rm`
 
-Implementing the unfinished search feature in this repository.
-
-
-
-\## Inputs
-
-\- `README.md`
-
-\- `MainActivity`
-
-\- `SearchViewModel`
-
-\- `SearchScreen`
-
-\- `ProductService`
-
-\- existing tests
-
-
-
-\## Constraints
-
-\- Use Kotlin
-
-\- Use Compose
-
-\- Use the existing `ProductService`
-
-\- Do not add Repository or UseCase layers
-
-\- Keep implementation minimal and assessment-aligned
-
-
-
-\## Procedure
-
-1\. Read `README.md` and inspect unfinished files.
-
-2\. Inspect `ProductService` behavior.
-
-3\. Define minimal UI state:
-
-&#x20;  - query
-
-&#x20;  - loading
-
-&#x20;  - products
-
-&#x20;  - error
-
-4\. Implement `SearchViewModel` using `StateFlow` and coroutines.
-
-5\. Implement `SearchScreen` using Compose.
-
-6\. Ensure `MainActivity` renders the screen.
-
-7\. Add or update tests for key state transitions.
-
-8\. Invoke `run-android-validation`.
-
-9\. If validation fails, invoke `repair-from-sensors`.
-
-
-
-\## Success criteria
-
-\- compiles
-
-\- tests pass
-
-\- detekt passes
-
-\- loading, success, and error states are handled
-
-\- repository constraints are respected
-
+## Deliverable
+Produce the implementation changes only.
+Do not claim completion until validation has run successfully or failures have been clearly reported for repair.

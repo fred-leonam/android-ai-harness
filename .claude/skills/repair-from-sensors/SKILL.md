@@ -1,54 +1,46 @@
-\---
-
+---
 name: repair-from-sensors
-
-description: Repair implementation based on compile, test, or detekt failures
-
+description: Repair only what compile test or detekt failures indicate is broken, then hand back for validation
+context: fork
 agent: android-repairer
+---
 
-\---
+# Skill: repair-from-sensors
 
+Repair the implementation based only on validation failures.
 
+## Inputs
+Use:
+- validation command output
+- test failures
+- detekt failures
+- `.claude/reports/validation-status.json` if present
 
-\# Skill: repair-from-sensors
+## Rules
+- Repair only what the failing sensors indicate is broken.
+- Do not broaden scope.
+- Do not introduce new architecture layers.
+- Preserve the assessment constraints.
+- Prefer the smallest viable fix.
+- Do not claim success without re-running validation.
 
+## Operating system expectations
+This repository is executed primarily on Windows.
 
+Always prefer:
+- PowerShell scripts (`.ps1`)
+- `powershell -ExecutionPolicy Bypass -File ...`
+- `.\gradlew.bat`
 
-\## Procedure
+Do not assume:
+- bash
+- WSL
+- Git Bash
+- Unix utilities like `chmod`, `sed`, `grep`, or `rm`
 
-1\. Read the latest validation failure output.
-
-2\. Classify failures:
-
-&#x20;  - compile
-
-&#x20;  - test
-
-&#x20;  - detekt
-
-3\. Prioritize:
-
-&#x20;  - compile first
-
-&#x20;  - tests second
-
-&#x20;  - detekt third
-
-4\. Map each failure to the smallest likely file surface.
-
-5\. Patch only those files.
-
-6\. Re-run `run-android-validation`.
-
-7\. Repeat until green or retry budget is exhausted.
-
-
-
-\## Rules
-
-\- Do not rewrite broad parts of the repo for localized failures
-
-\- Preserve existing behavior unless failure requires change
-
-\- Do not add prohibited architecture layers
-
+## Deliverable
+Return:
+- what failed
+- what was changed to repair it
+- what still remains risky
+Then hand back to validation.
