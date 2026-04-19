@@ -28,6 +28,7 @@ $requiredProps = @(
     "detekt",
     "overall",
     "summary",
+    "raw_log_path",
     "steps"
 )
 
@@ -43,15 +44,13 @@ if ([string]$report.generator -ne "scripts/validate.ps1") {
     exit 2
 }
 
-if ([int]$report.schema_version -ne 2) {
-    Write-Host "Blocking stop: validation report schema_version must be 2"
+if ([int]$report.schema_version -ne 3) {
+    Write-Host "Blocking stop: validation report schema_version must be 3"
     exit 2
 }
 
 $allowedPhaseValues = @("PASS", "FAIL", "NOT_RUN")
-$phaseProps = @("compile", "tests", "detekt")
-
-foreach ($prop in $phaseProps) {
+foreach ($prop in @("compile", "tests", "detekt")) {
     $value = [string]$report.$prop
     if ($allowedPhaseValues -notcontains $value) {
         Write-Host "Blocking stop: validation report property '$prop' has invalid value '$value'"
@@ -65,8 +64,7 @@ if (@("PASS", "FAIL") -notcontains $overall) {
     exit 2
 }
 
-$summary = [string]$report.summary
-if ([string]::IsNullOrWhiteSpace($summary)) {
+if ([string]::IsNullOrWhiteSpace([string]$report.summary)) {
     Write-Host "Blocking stop: validation summary is empty"
     exit 2
 }
@@ -90,11 +88,24 @@ if ([int]$report.duration_ms -lt 0) {
     exit 2
 }
 
-$expectedCommands = @{
-    compile = ".\gradlew.bat :app:compileDebugKotlin"
-    tests   = ".\gradlew.bat :app:testDebugUnitTest --rerun-tasks"
-    detekt  = ".\gradlew.bat :app:detekt"
+$expectedRawLogPath = ".\.claude\reports\validation-raw.log"
+if ([string]$report.raw_log_path -ne $expectedRawLogPath) {
+    Write-Host "Blocking stop: raw_log_path must be '$expectedRawLogPath'"
+    exit 2
 }
+
+if (-not (Test-Path $report.raw_log_path)) {
+    Write-Host "Blocking stop: validation raw log is missing at $($report.raw_log_path)"
+    exit 2
+}
+
+$expectedCommands = @{
+    compile = ".\gradlew.bat :app:compileDebugKotlin --rerun-tasks --no-build-cache --console=plain"
+    tests   = ".\gradlew.bat :app:testDebugUnitTest --rerun-tasks --no-build-cache --console=plain"
+    detekt  = ".\gradlew.bat :app:detekt --rerun-tasks --no-build-cache --console=plain"
+}
+
+$allowedTaskOutcomes = @("EXECUTED", "UP_TO_DATE", "FROM_CACHE", "NO_SOURCE", "UNKNOWN")
 
 foreach ($stepName in @("compile", "tests", "detekt")) {
     if (-not ($report.steps.PSObject.Properties.Name -contains $stepName)) {
@@ -104,7 +115,7 @@ foreach ($stepName in @("compile", "tests", "detekt")) {
 
     $step = $report.steps.$stepName
 
-    foreach ($requiredStepProp in @("status", "command", "exit_code", "started_at", "finished_at", "duration_ms")) {
+    foreach ($requiredStepProp in @("status", "command", "exit_code", "started_at", "finished_at", "duration_ms", "task_outcome")) {
         if (-not ($step.PSObject.Properties.Name -contains $requiredStepProp)) {
             Write-Host "Blocking stop: steps.$stepName.$requiredStepProp is missing"
             exit 2
@@ -121,35 +132,31 @@ foreach ($stepName in @("compile", "tests", "detekt")) {
         exit 2
     }
 
-    if (
-        [string]$step.status -eq "PASS" -and
-        [int]$step.exit_code -ne 0
-    ) {
+    if ($allowedTaskOutcomes -notcontains [string]$step.task_outcome) {
+        Write-Host "Blocking stop: invalid task_outcome for steps.$stepName"
+        exit 2
+    }
+
+    if ([string]$step.status -eq "PASS" -and [int]$step.exit_code -ne 0) {
         Write-Host "Blocking stop: PASS step '$stepName' must have exit_code 0"
         exit 2
     }
 
-    if (
-        [string]$step.status -eq "FAIL" -and
-        [int]$step.exit_code -eq 0
-    ) {
+    if ([string]$step.status -eq "FAIL" -and [int]$step.exit_code -eq 0) {
         Write-Host "Blocking stop: FAIL step '$stepName' cannot have exit_code 0"
         exit 2
     }
 
-    if (
-        [string]$step.status -eq "NOT_RUN" -and
-        [int]$step.exit_code -ne -1
-    ) {
+    if ([string]$step.status -eq "NOT_RUN" -and [int]$step.exit_code -ne -1) {
         Write-Host "Blocking stop: NOT_RUN step '$stepName' must have exit_code -1"
         exit 2
     }
 
-    try {
-        $null = [DateTimeOffset]::Parse($step.started_at)
-        $null = [DateTimeOffset]::Parse($step.finished_at)
-    } catch {
-        if ([string]$step.status -ne "NOT_RUN") {
+    if ([string]$step.status -ne "NOT_RUN") {
+        try {
+            $null = [DateTimeOffset]::Parse($step.started_at)
+            $null = [DateTimeOffset]::Parse($step.finished_at)
+        } catch {
             Write-Host "Blocking stop: timestamps for executed step '$stepName' are invalid"
             exit 2
         }
@@ -198,6 +205,20 @@ if ($null -ne $latestCodeWrite) {
         Write-Host "Latest file: $($latestCodeWrite.FullName)"
         Write-Host "Latest write (UTC): $latestWriteUtc"
         Write-Host "Report time (UTC): $reportUtc"
+        exit 2
+    }
+}
+
+$rawLog = Get-Content $report.raw_log_path -Raw
+
+foreach ($requiredLogMarker in @(
+    "== compile ==",
+    "== tests ==",
+    "== detekt ==",
+    "Validation report written to .\.claude\reports\validation-status.json"
+)) {
+    if ($rawLog -notmatch [Regex]::Escape($requiredLogMarker)) {
+        Write-Host "Blocking stop: raw log is missing expected marker '$requiredLogMarker'"
         exit 2
     }
 }
