@@ -13,7 +13,7 @@ Run validation for this Android repository and produce canonical validation arti
 Always prefer Windows-native execution.
 
 Run:
-1. `powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1`
+1. `powershell -ExecutionPolicy Bypass -Command "& .\scripts\validate.ps1"`
 
 Do not use direct Gradle commands as the canonical validation path.
 

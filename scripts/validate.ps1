@@ -40,16 +40,25 @@ function Write-ValidationLogLine {
 
 function Get-TaskOutcome {
     param(
-        [Parameter(Mandatory = $true)]
-        [string[]]$Lines,
+        [string[]]$Lines = @(),
 
         [Parameter(Mandatory = $true)]
         [string]$TaskName
     )
 
+    $normalizedLines = @($Lines)
+
+    if ($normalizedLines.Count -eq 0) {
+        return "UNKNOWN"
+    }
+
     $prefix = "> Task $TaskName"
 
-    foreach ($line in $Lines) {
+    foreach ($line in $normalizedLines) {
+        if ([string]::IsNullOrWhiteSpace($line)) {
+            continue
+        }
+
         if ($line -like "$prefix*") {
             if ($line -match "UP-TO-DATE") { return "UP_TO_DATE" }
             if ($line -match "FROM-CACHE") { return "FROM_CACHE" }
@@ -97,22 +106,26 @@ function Invoke-ValidationStep {
     $process.WaitForExit()
 
     $lines = @()
+
     if (-not [string]::IsNullOrWhiteSpace($stdout)) {
-        $lines += ($stdout -split "`r?`n")
-    }
-    if (-not [string]::IsNullOrWhiteSpace($stderr)) {
-        $lines += ($stderr -split "`r?`n")
+        $lines += @($stdout -split "`r?`n")
     }
 
+    if (-not [string]::IsNullOrWhiteSpace($stderr)) {
+        $lines += @($stderr -split "`r?`n")
+    }
+
+    $lines = @(
+        $lines | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+    )
+
     foreach ($line in $lines) {
-        if (-not [string]::IsNullOrWhiteSpace($line)) {
-            Write-ValidationLogLine $line
-        }
+        Write-ValidationLogLine $line
     }
 
     $stepFinishedAt = [DateTimeOffset]::Now
     $exitCode = $process.ExitCode
-    $taskOutcome = Get-TaskOutcome -Lines $lines -TaskName $TaskName
+    $taskOutcome = Get-TaskOutcome -Lines @($lines) -TaskName $TaskName
 
     return [ordered]@{
         status       = if ($exitCode -eq 0) { "PASS" } else { "FAIL" }
