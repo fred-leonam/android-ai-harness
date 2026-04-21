@@ -16,6 +16,26 @@ The default goal is to make the smallest viable correct change and preserve a re
 
 ---
 
+# AI Architecture References
+
+This harness is defined across multiple control-plane documents.
+
+The following documents are authoritative and must be treated as part of the AI operating model:
+
+- `docs/ai/operating-model.md` — system structure, responsibilities, execution lifecycle, escalation model, and completion model
+- `docs/ai/task-routing.md` — task classification, routing rules, escalation paths, and expected validation paths
+- `docs/ai/validation-tiers.md` — validation tier definitions, usage model, and canonical final validation expectations
+
+## Usage Rules
+
+- `CLAUDE.md` is the top-level control-plane entry point.
+- The documents under `docs/ai/` provide detailed behavioral and operational specification.
+- These documents MUST be consulted when relevant to the task.
+- Do not duplicate their content unnecessarily in this file.
+- In case of conflict, `CLAUDE.md` takes precedence unless it explicitly delegates authority.
+
+---
+
 # Operating System
 
 This repository is executed primarily on Windows.
