@@ -42,7 +42,7 @@ This repository is executed primarily on Windows.
 
 Always prefer:
 - PowerShell scripts (`.ps1`)
-- `powershell -ExecutionPolicy Bypass -File ...`
+- `powershell -ExecutionPolicy Bypass -Command "& .\scripts\<script>.ps1"`
 - `.\gradlew.bat` only through approved scripts
 
 Do not assume:
@@ -200,7 +200,7 @@ This repository uses multiple validation tiers.
 ## Tier 0 — Formatting / Hygiene
 
 Execution:
-- `powershell -ExecutionPolicy Bypass -File .\scripts\format.ps1`
+- `powershell -ExecutionPolicy Bypass -Command "& .\scripts\format.ps1"`
 
 Purpose:
 - lightweight normalization of changed files
@@ -216,7 +216,7 @@ Rules:
 ## Tier 1 — Fast Validation
 
 Execution:
-- `powershell -ExecutionPolicy Bypass -File .\scripts\validate-fast.ps1`
+- `powershell -ExecutionPolicy Bypass -Command "& .\scripts\validate-fast.ps1"`
 
 Purpose:
 - provide cheap inner-loop confidence during active development
@@ -241,7 +241,7 @@ Artifacts:
 ## Tier 2 — Scoped / Module Validation
 
 Execution:
-- `powershell -ExecutionPolicy Bypass -File .\scripts\validate-module.ps1`
+- `powershell -ExecutionPolicy Bypass -Command "& .\scripts\validate-module.ps1"`
 - or module-specific invocation when supported
 
 Purpose:
@@ -267,7 +267,7 @@ Artifacts:
 ## Tier 3 — Canonical Final Validation
 
 Execution:
-- `powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1`
+- `powershell -ExecutionPolicy Bypass -Command "& .\scripts\validate.ps1"`
 
 This is the single authoritative final validation path.
 

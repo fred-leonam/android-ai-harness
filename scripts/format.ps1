@@ -11,18 +11,24 @@ function Get-GitChangedFiles {
     try {
         Push-Location $RepoRoot
         $output = git diff --name-only --diff-filter=ACMR HEAD 2>$null
-        Pop-Location
 
         if (-not $output) {
-            return @()
+            return ,@()
         }
 
-        return @($output | Where-Object { $_ -and $_.Trim().Length -gt 0 })
+        $filtered = @(
+            $output |
+            Where-Object { $_ -and $_.Trim().Length -gt 0 }
+        )
+
+        return ,$filtered
     }
     catch {
-        try { Pop-Location } catch {}
         Write-Info "Unable to determine changed files from git. Skipping targeted formatting."
-        return @()
+        return ,@()
+    }
+    finally {
+        try { Pop-Location } catch {}
     }
 }
 
@@ -53,8 +59,8 @@ function Normalize-KotlinFile([string]$path) {
 function Main {
     Write-Info "Starting lightweight formatting."
 
-    $changedFiles = Get-GitChangedFiles
-    if ($changedFiles.Count -eq 0) {
+    $changedFiles = @(Get-GitChangedFiles)
+    if (@($changedFiles).Count -eq 0) {
         Write-Info "No changed files detected. Nothing to format."
         return
     }
@@ -68,7 +74,7 @@ function Main {
         }
     )
 
-    if ($targets.Count -eq 0) {
+    if (@($targets).Count -eq 0) {
         Write-Info "No Kotlin, Gradle Kotlin, or Markdown files changed."
         return
     }

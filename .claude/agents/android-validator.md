@@ -13,7 +13,7 @@ Run deterministic validation and report the result clearly.
 Always prefer Windows-native execution.
 
 Use:
-- `powershell -ExecutionPolicy Bypass -File .\scripts\validate.ps1`
+- `powershell -ExecutionPolicy Bypass -Command "& .\scripts\validate.ps1"`
 
 Do not assume:
 - bash
