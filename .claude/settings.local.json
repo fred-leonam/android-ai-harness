@@ -1,0 +1,17 @@
+{
+  "env": {
+    "JAVA_HOME": "C:\\Program Files\\Android\\Android Studio\\jbr",
+    "ANDROID_SDK_ROOT": "C:\\Users\\fredl\\AppData\\Local\\Android\\Sdk"
+  },
+  "validation": {
+    "autoRunFastOnEdit": true,
+    "defaultModule": "app"
+  },
+  "workflow": {
+    "autoFormatOnEdit": true,
+    "preferFastValidation": true
+  },
+  "logging": {
+    "level": "info"
+  }
+}

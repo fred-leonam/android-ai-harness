@@ -5,39 +5,53 @@
       "Read(*)",
       "Glob(*)",
       "Grep(*)",
+
       "Edit(app/**)",
-      "Edit(config/**)",
-      "Edit(README.md)",
-      "Edit(build.gradle.kts)",
-      "Edit(settings.gradle.kts)",
-      "Edit(gradle.properties)",
-      "Edit(local.properties)",
       "Write(app/**)",
+
+      "Edit(config/**)",
       "Write(config/**)",
+
+      "Edit(README.md)",
       "Write(README.md)",
+      "Edit(build.gradle.kts)",
       "Write(build.gradle.kts)",
+      "Edit(settings.gradle.kts)",
       "Write(settings.gradle.kts)",
+      "Edit(gradle.properties)",
       "Write(gradle.properties)",
+      "Edit(local.properties)",
       "Write(local.properties)",
+
+      "Edit(docs/**)",
+      "Write(docs/**)",
+
       "Bash(powershell -ExecutionPolicy Bypass -Command \"& .\\scripts\\ensure-claude-dirs.ps1\")",
-      "Bash(powershell -ExecutionPolicy Bypass -Command \"& .\\scripts\\lightweight-format.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"& .\\scripts\\format.ps1\")",
       "Bash(powershell -ExecutionPolicy Bypass -Command \"& .\\scripts\\block-dangerous-command.ps1 '$CLAUDE_TOOL_INPUT'\")",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"& .\\scripts\\validate-fast.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"& .\\scripts\\validate-module.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"& .\\scripts\\validate-module.ps1 -Module app\")",
       "Bash(powershell -ExecutionPolicy Bypass -Command \"& .\\scripts\\validate.ps1\")",
-      "Bash(powershell -ExecutionPolicy Bypass -Command \"& .\\scripts\\require-validation-report.ps1\")"
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"& .\\scripts\\require-validation-report.ps1 '$CLAUDE_TOOL_INPUT'\")"
     ],
     "deny": [
       "Edit(.claude/reports/**)",
       "Write(.claude/reports/**)",
+
       "Edit(.claude/settings.json)",
       "Write(.claude/settings.json)",
       "Edit(.claude/settings.local.json)",
       "Write(.claude/settings.local.json)",
+
       "Edit(.claude/agents/**)",
       "Write(.claude/agents/**)",
       "Edit(.claude/skills/**)",
       "Write(.claude/skills/**)",
+
       "Edit(CLAUDE.md)",
       "Write(CLAUDE.md)",
+
       "Edit(scripts/validate.ps1)",
       "Write(scripts/validate.ps1)",
       "Edit(scripts/require-validation-report.ps1)",
@@ -48,10 +62,12 @@
       "Write(scripts/block-dangerous-command.ps1)",
       "Edit(scripts/ensure-claude-dirs.ps1)",
       "Write(scripts/ensure-claude-dirs.ps1)",
+
       "Bash(.\\gradlew.bat *)",
       "Bash(cmd.exe /c \"gradlew.bat *\")",
       "Bash(cmd.exe /c \".\\\\gradlew.bat *\")",
       "Bash(powershell *)",
+
       "Bash(rm -rf *)",
       "Bash(git push --force*)",
       "Bash(git reset --hard*)",
@@ -65,7 +81,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -ExecutionPolicy Bypass -Command \"& .\\scripts\\lightweight-format.ps1\""
+            "command": "powershell -ExecutionPolicy Bypass -Command \"& .\\scripts\\format.ps1\""
           }
         ]
       }
@@ -86,7 +102,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "powershell -ExecutionPolicy Bypass -Command \"& .\\scripts\\require-validation-report.ps1\""
+            "command": "powershell -ExecutionPolicy Bypass -Command \"& .\\scripts\\require-validation-report.ps1 '$CLAUDE_TOOL_INPUT'\""
           }
         ]
       }

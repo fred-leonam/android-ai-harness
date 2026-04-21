@@ -1,108 +1,56 @@
-\---
-
+---
 name: finalize-change
-
-description: Perform final readiness review and produce a structured human handoff summary for this Android assessment change
-
+description: Perform final readiness review and produce a structured human handoff summary for an Android change
 context: fork
+agent: android-release-assistant
+---
 
-agent: android-reviewer
-
-\---
-
-
-
-\# Skill: finalize-change
-
-
+# Skill: finalize-change
 
 Perform the final readiness review before human handoff.
 
+## Review checklist
+1. Requirement coverage
+2. Alignment with `CLAUDE.md`
+3. Minimality of changes
+4. Validation completeness
+5. Remaining technical risks
+6. User-visible behavior summary
 
-
-\## Review checklist
-
-1\. Requirement coverage
-
-2\. Alignment with `CLAUDE.md`
-
-3\. Minimality of changes
-
-4\. Validation completeness
-
-5\. Remaining technical risks
-
-6\. User-visible behavior summary
-
-
-
-\## Inputs
-
+## Inputs
 Review:
+- changed files
+- implementation summary
+- validation results
+- `.claude/reports/validation-status.json` when present
 
-\- changed files
+## Rules
+- Do not perform broad new implementation in this skill.
+- Focus on final review and handoff quality.
+- If validation is missing or stale, clearly say so.
+- If risks remain, separate them from confirmed behavior.
 
-\- implementation summary
-
-\- validation results
-
-\- `.claude/reports/validation-status.json`
-
-
-
-\## Rules
-
-\- Do not perform broad new implementation in this skill.
-
-\- Focus on final review and handoff quality.
-
-\- If validation is missing or stale, clearly say so.
-
-\- If risks remain, separate them from confirmed behavior.
-
-
-
-\## Required output
-
+## Required output
 Return exactly these sections:
 
+### Changed files
+- list of changed files
 
+### Validation results
+- compile
+- tests
+- detekt
+- overall
 
-\### Changed files
+### Confirmed behavior
+- short summary of what the user can expect now
 
-\- list of changed files
+### Remaining risks
+- unresolved risks, if any
 
-
-
-\### Validation results
-
-\- compile
-
-\- tests
-
-\- detekt
-
-\- overall
-
-
-
-\### Confirmed behavior
-
-\- short summary of what the user can expect now
-
-
-
-\### Remaining risks
-
-\- unresolved risks, if any
-
-
-
-\### Recommendation
-
-\- READY FOR HUMAN REVIEW
+### Recommendation
+- READY FOR HUMAN REVIEW
 
 or
 
-\- NOT READY FOR HUMAN REVIEW
-
+- NOT READY FOR HUMAN REVIEW
