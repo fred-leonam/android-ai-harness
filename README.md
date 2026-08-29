@@ -1,6 +1,6 @@
 # Android AI engineering harness
 
-This repository is an Android workspace with a **Claude-oriented AI harness**: specialized agents, skills, scripts, and a protected control plane. The app under `app/` is the work surface. The harness is the system that decides *how* work is done, *who* does it, and *when* it is complete.
+This repository is an Android workspace with a **Claude-oriented AI harness**: specialized agents, skills, scripts, and a protected control plane. The harness is the system that decides *how* work is done, *who* does it, and *when* it is complete.
 
 The goal is daily Android delivery that stays small, reviewable, and evidence-based. No meaningful production change is complete without canonical validation.
 
